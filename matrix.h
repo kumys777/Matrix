@@ -1,16 +1,17 @@
-#ifndef STUDENT_H
-#define STUDENT_H
+#ifndef MATRIX_H
+#define MATRIX_H
 #include <stdio.h>
-#include <stdexcept>
+#include <typeinfo>
 #include "exception.h"
 using namespace std;
 
 
-class Matrix{
+template<typename T>
+class Matrix: public T {
     private:
         int width = 0;
         int height = 0;
-        int* matrix = nullptr;
+        T* matrix = nullptr;
     public:
         Matrix(){
             width = 0;
@@ -57,19 +58,23 @@ class Matrix{
             if (!(file = fopen(filename, "r"))){
                 return 1;
             }
-            int* new_array = new int[w * h];
+            T* new_array = new T[w * h];
             if (!new_array){
                 return 3;
             }
             int index = 0;
-            while (fscanf(file, "%d", new_array + index) == 1 && index <= w * h){
+
+            T element;
+            int ret = element.read(file);
+            while (ret == 0 && index < w * h){
+                new_array[index] = element;
                 index++;
+                ret = element.read(file);
             }
-            if (!feof(file)){
-                delete[] new_array;
+            if (ret == 1){
                 return 2;
             }
-            if (index <= w * h){
+            if (index < w * h){
                 return 2;
             }
             matrix = new_array;
@@ -79,6 +84,7 @@ class Matrix{
             return 0;
         }
 
+        /*
         int read_matrix(const char* filename){
             FILE* file;
             if (!(file = fopen(filename, "r"))){
@@ -109,18 +115,20 @@ class Matrix{
             matrix = new_array;
             return 0;
         }
+        */
     
         void print_matrix(FILE* fp=stdout){
             for (int i = 0; i < width; i++){
                 for (int j = 0; j < height; j++){
-                    fprintf(fp, "%d ", matrix[i * height + j]);
+                    matrix[i * height + j].print(fp);
+                    printf(" ");
                 }
                 printf("\n");
             }
         }
 
-        int* make_copy(const Matrix x, int width, int height){
-            int* array = new int[width * height];
+        T* make_copy(const Matrix x, int width, int height){
+            T* array = new T[width * height];
             if (!array){
                 throw MemoryError("No memory\n");
             }
@@ -137,7 +145,7 @@ class Matrix{
         void reverse();
     public:
         Matrix operator+(const Matrix& other) const {
-            int* array = new int[width * height];
+            T* array = new T[width * height];
             if (!array){
                 throw MemoryError("No memory\n");
             }
@@ -162,20 +170,20 @@ class Matrix{
             }
             int new_width = width;
             int new_height = other.height;
-            int* array = new int[new_width * new_height];
+            T* array = new T[new_width * new_height];
             if (!array){
                 throw MemoryError("No memory\n");
             }
-            int sum;
+            T sum;
             Matrix A;
             A.width = new_width;
             A.height = new_height;
             A.matrix = array;
             for (int i = 0; i < new_width; i++){
                 for (int j = 0; j < new_height; j++){
-                    sum = 0;
+                    sum.init(0, 1);
                     for (int k = 0; k < height; k++){
-                        sum += matrix[i * height + k] * other.matrix[k * height + j]; 
+                        sum = sum + matrix[i * height + k] * other.matrix[k * height + j]; 
                     }
                     array[i * height + j] = sum;
                 }

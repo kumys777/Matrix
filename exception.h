@@ -1,3 +1,5 @@
+#ifndef EXCEPTION_H
+#define EXCEPTION_H
 #include <iostream>
 using namespace std;
 
@@ -21,3 +23,14 @@ public:
         return message.c_str();
     }
 };
+
+class DividebyZero: public std::exception {
+private:
+    std::string message;
+public:
+    DividebyZero(const std::string& msg) : message(msg) {}
+    virtual const char* what() const noexcept override {
+        return message.c_str();
+    }
+};
+#endif
