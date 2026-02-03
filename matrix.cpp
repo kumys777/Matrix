@@ -1,6 +1,7 @@
 #include "matrix.h"
 
-void Matrix::transposition(){
+template <typename T>
+void Matrix<T>::transposition(){
     // добавить: если матрица квадратная, то новый массив не создаётся
     int* array = new int[height * width];
     for (int i = 0; i < height; i++){
@@ -16,7 +17,8 @@ void Matrix::transposition(){
     height = swap; 
 }
 
-int Matrix::determinant(){ // не работает
+template <typename T>
+int Matrix<T>::determinant(){ // не работает
     int output;
     if (width != height){
         throw std::invalid_argument("The matrix is not square\n");
@@ -25,7 +27,8 @@ int Matrix::determinant(){ // не работает
     return output;
 }
 
-void Matrix::reverse(){ // не работает
+template <typename T>
+void Matrix<T>::reverse(){ // не работает
     if (width != height){
         throw std::invalid_argument("The matrix is not square\n");
     }
